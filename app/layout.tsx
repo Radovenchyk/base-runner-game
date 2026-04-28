@@ -40,15 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      <html lang="en">
+    <html lang="en">
       <head>
         <meta name="base:app_id" content="69ef98d57e92b7a4af93efe1" />
       </head>
-        <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+      <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+        <Providers>
           <SafeArea>{children}</SafeArea>
-        </body>
-      </html>
-    </Providers>
+        </Providers>
+      </body>
+    </html>
   );
 }
