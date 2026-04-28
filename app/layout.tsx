@@ -5,26 +5,24 @@ import { farcasterConfig } from "../farcaster.config";
 import { Providers } from "./providers";
 import "./globals.css";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: farcasterConfig.miniapp.name,
-    description: farcasterConfig.miniapp.description,
-    other: {
-      "fc:frame": JSON.stringify({
-        version: farcasterConfig.miniapp.version,
-        imageUrl: farcasterConfig.miniapp.heroImageUrl,
-        button: {
-          title: `Join the ${farcasterConfig.miniapp.name} Waitlist`,
-          action: {
-            name: `Launch ${farcasterConfig.miniapp.name}`,
-            type: "launch_frame",
-          },
+export const metadata: Metadata = {
+  title: farcasterConfig.miniapp.name,
+  description: farcasterConfig.miniapp.description,
+  other: {
+    "fc:frame": JSON.stringify({
+      version: farcasterConfig.miniapp.version,
+      imageUrl: farcasterConfig.miniapp.heroImageUrl,
+      button: {
+        title: `Join the ${farcasterConfig.miniapp.name} Waitlist`,
+        action: {
+          name: `Launch ${farcasterConfig.miniapp.name}`,
+          type: "launch_frame",
         },
-      }),
-      "base:app_id": "69ef98d57e92b7a4af93efe1",
-    },
-  };
-}
+      },
+    }),
+    "base:app_id": "69ef98d57e92b7a4af93efe1",
+  },
+};
 
 const inter = Inter({
   variable: "--font-inter",
