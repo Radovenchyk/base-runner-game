@@ -54,7 +54,7 @@ export function CheckinButton() {
         {
           to: "0x0000000000000000000000000000000000000000",
           data: BUILDER_CODE,
-          value: 0n,
+          value: BigInt(0),
         },
       ],
       capabilities: {
