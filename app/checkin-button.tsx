@@ -7,7 +7,8 @@ import { base } from "wagmi/chains";
 
 const CONTRACT_ADDRESS = "0xbA4779267DFB7E0df120FDDAc89a85a293c05f3C" as `0x${string}`;
 const PAYMASTER_URL = "https://api.developer.coinbase.com/rpc/v1/base/85OEROoKX4zOsDGeJV36cBDFceojcCND";
-const BUILDER_CODE = "0x62635f367439326262707a0b0080218021802180218021802180218021" as `0x${string}`;
+// Builder Code encoded string з base.dev → Settings → Builder Code → Encoded String
+const BUILDER_CODE_ENCODED = "0x62635f367439326262707a0b0080218021802180218021802180218021";
 const ABI = [{ name: "checkIn", type: "function", stateMutability: "nonpayable", inputs: [], outputs: [] }] as const;
 
 const baseConnector = coinbaseWallet({ appName: "Base Runner", preference: "smartWalletOnly" });
@@ -45,21 +46,18 @@ export function CheckinButton() {
   const handleCheckin = (e: React.MouseEvent) => {
     stop(e);
     sendCalls({
-      calls: [
-        {
-          to: CONTRACT_ADDRESS,
-          data: encodeFunctionData({ abi: ABI, functionName: "checkIn" }),
-        },
-        // ✅ Builder Code — тегує транзакцію для атрибуції та лідерборду
-        {
-          to: "0x0000000000000000000000000000000000000000",
-          data: BUILDER_CODE,
-          value: BigInt(0),
-        },
-      ],
+      calls: [{
+        to: CONTRACT_ADDRESS,
+        data: encodeFunctionData({ abi: ABI, functionName: "checkIn" }),
+      }],
       capabilities: {
-        [base.id]: {
-          paymasterService: { url: PAYMASTER_URL },
+        // ✅ Правильний спосіб — dataSuffix capability згідно ERC-8021
+        dataSuffix: {
+          value: BUILDER_CODE_ENCODED,
+          optional: true,
+        },
+        paymasterService: {
+          url: PAYMASTER_URL,
         },
       },
     });
