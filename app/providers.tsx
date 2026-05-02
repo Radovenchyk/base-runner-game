@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useState } from "react";
 import { base } from "wagmi/chains";
-import { createConfig, http, WagmiProvider } from "wagmi";
+import { createConfig, http, WagmiProvider, injected } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { farcasterMiniApp } from "@farcaster/miniapp-wagmi-connector";
 import { MiniAppProvider } from "./providers/MiniAppProvider";
@@ -9,12 +9,14 @@ import { MiniAppProvider } from "./providers/MiniAppProvider";
 const config = createConfig({
   chains: [base],
   transports: { [base.id]: http() },
-  connectors: [farcasterMiniApp()],
+  connectors: [
+    farcasterMiniApp(), // Base App / Farcaster
+    injected(),         // Браузер (Rabby, MetaMask)
+  ],
 });
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
-
   return (
     <MiniAppProvider>
       <WagmiProvider config={config}>
