@@ -19,12 +19,12 @@ export function CheckinButton() {
     id: callsIdStr!,
     query: {
       enabled: !!callsIdStr,
-      refetchInterval: (d: any) => d.state.data?.status === "CONFIRMED" ? false : 1000,
+      refetchInterval: (d: any) => d.state.data?.status === "success" ? false : 1000,
     },
   });
 
-  const isConfirming = callsStatus?.status === "PENDING";
-  const isSuccess = callsStatus?.status === "CONFIRMED";
+  const isConfirming = callsStatus?.status === "pending";
+  const isSuccess = callsStatus?.status === "success";
   const txHash = (callsStatus as any)?.receipts?.[0]?.transactionHash;
 
   const btn: React.CSSProperties = {
