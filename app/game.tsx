@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { CheckinButton } from "./checkin-button";
 
 const GRAVITY = 0.5, JUMP = -9, PIPE_SPEED = 3, PIPE_GAP = 160, PIPE_WIDTH = 60, BIRD_SIZE = 30;
 
@@ -57,9 +58,9 @@ export default function Game() {
 
   return (
     <div style={s.wrap} onClick={jump}>
-      {screen === "menu" && (<div style={{textAlign:"center"}}><div style={s.title}>🏃 Base Runner</div><div style={s.sub}>Tap or press Space to fly</div><button style={s.btn} onClick={startGame}>Play</button></div>)}
+      {screen === "menu" && (<div style={{textAlign:"center"}}><div style={s.title}>🏃 Base Runner</div><div style={s.sub}>Tap or press Space to fly</div><button style={s.btn} onClick={e=>{e.stopPropagation();startGame()}}>Play</button><CheckinButton /></div>)}
       {screen === "game" && <canvas ref={canvasRef} width={390} height={600} style={{borderRadius:16,boxShadow:"0 0 40px #0052ff55"}} />}
-      {screen === "over" && (<div style={{textAlign:"center"}}><div style={{...s.title,color:"#ff4444"}}>Game Over</div><div style={s.score}>Score: <span style={{color:"#FFD700"}}>{score}</span></div><div style={{color:"#aaa",marginBottom:24}}>Best: {best}</div><button style={s.btn} onClick={startGame}>Retry</button><button style={{...s.btn,background:"#333"}} onClick={()=>setScreen("menu")}>Menu</button></div>)}
+      {screen === "over" && (<div style={{textAlign:"center"}}><div style={{...s.title,color:"#ff4444"}}>Game Over</div><div style={s.score}>Score: <span style={{color:"#FFD700"}}>{score}</span></div><div style={{color:"#aaa",marginBottom:24}}>Best: {best}</div><button style={s.btn} onClick={e=>{e.stopPropagation();startGame()}}>Retry</button><button style={{...s.btn,background:"#333"}} onClick={e=>{e.stopPropagation();setScreen("menu")}}>Menu</button><CheckinButton /></div>)}
     </div>
   );
 }
