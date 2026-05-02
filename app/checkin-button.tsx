@@ -1,5 +1,5 @@
 "use client";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect, useReconnect } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from "wagmi";
 import { useEffect } from "react";
 
 const CONTRACT_ADDRESS = "0xbA4779267DFB7E0df120FDDAc89a85a293c05f3C" as `0x${string}`;
@@ -8,30 +8,26 @@ const ABI = [{ name: "checkIn", type: "function", stateMutability: "nonpayable",
 export function CheckinButton() {
   const { isConnected } = useAccount();
   const { connect, connectors } = useConnect();
-  const { reconnect } = useReconnect();
   const { writeContract, data: hash, isPending, isError, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
-  // Авто-підключення при відкритті в Base App
+  // Авто-підключення — спрацьовує в Base App автоматично
   useEffect(() => {
-    reconnect();
-  }, []);
+    if (!isConnected && connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    }
+  }, [connectors, isConnected]);
 
   const btn: React.CSSProperties = {
     padding: "12px 32px", background: "#0052ff", color: "#fff", border: "none",
     borderRadius: 24, fontSize: 16, fontWeight: "bold", cursor: "pointer", margin: 8,
-    opacity: isPending || isConfirming ? 0.7 : 1
+    opacity: isPending || isConfirming ? 0.7 : 1,
   };
 
   const handleCheckin = (e: React.MouseEvent) => {
     e.stopPropagation();
     reset();
     writeContract({ address: CONTRACT_ADDRESS, abi: ABI, functionName: "checkIn" });
-  };
-
-  const handleConnect = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    connect({ connector: connectors[0] });
   };
 
   if (isSuccess) return (
@@ -43,7 +39,7 @@ export function CheckinButton() {
 
   if (!isConnected) return (
     <div style={{ textAlign: "center" }} onClick={e => e.stopPropagation()}>
-      <button style={btn} onClick={handleConnect}>🔗 Connect Wallet</button>
+      <button style={{ ...btn, background: "#444" }} disabled>⏳ Підключення...</button>
     </div>
   );
 
