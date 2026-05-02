@@ -1,5 +1,5 @@
 "use client";
-import { useConnect, useAccount, useDisconnect } from "wagmi";
+import { useConnect, useAccount } from "wagmi";
 import { useSendCalls, useCallsStatus } from "wagmi/experimental";
 import { coinbaseWallet } from "wagmi/connectors";
 import { encodeFunctionData } from "viem";
@@ -11,13 +11,21 @@ const ABI = [{ name: "checkIn", type: "function", stateMutability: "nonpayable",
 const baseConnector = coinbaseWallet({ appName: "Base Runner", preference: "smartWalletOnly" });
 
 export function CheckinButton() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { connect } = useConnect();
   const { sendCalls, data: callsId, isPending } = useSendCalls();
-  const { data: callsStatus } = useCallsStatus({ id: callsId as string, query: { enabled: !!callsId, refetchInterval: d => d.state.data?.status === "CONFIRMED" ? false : 1000 } });
+  const callsIdStr = callsId?.id as string | undefined;
+  const { data: callsStatus } = useCallsStatus({
+    id: callsIdStr!,
+    query: {
+      enabled: !!callsIdStr,
+      refetchInterval: (d: any) => d.state.data?.status === "CONFIRMED" ? false : 1000,
+    },
+  });
 
   const isConfirming = callsStatus?.status === "PENDING";
   const isSuccess = callsStatus?.status === "CONFIRMED";
+  const txHash = (callsStatus as any)?.receipts?.[0]?.transactionHash;
 
   const btn: React.CSSProperties = {
     padding: "12px 32px", background: "#0052ff", color: "#fff", border: "none",
@@ -25,11 +33,6 @@ export function CheckinButton() {
     opacity: isPending || isConfirming ? 0.7 : 1,
   };
   const stop = (e: React.MouseEvent) => e.stopPropagation();
-
-  const handleConnect = (e: React.MouseEvent) => {
-    stop(e);
-    connect({ connector: baseConnector });
-  };
 
   const handleCheckin = (e: React.MouseEvent) => {
     stop(e);
@@ -42,12 +45,16 @@ export function CheckinButton() {
   if (isSuccess) return (
     <div style={{ textAlign: "center", marginTop: 8 }} onClick={stop}>
       <div style={{ color: "#00aa44", fontWeight: "bold" }}>✅ Check-in виконано!</div>
-      <a href={`https://basescan.org/tx/${callsStatus?.receipts?.[0]?.transactionHash}`} target="_blank" rel="noopener noreferrer" style={{ color: "#aaa", fontSize: 13 }}>Переглянути в BaseScan ↗</a>
+      {txHash && <a href={`https://basescan.org/tx/${txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: "#aaa", fontSize: 13 }}>Переглянути в BaseScan ↗</a>}
     </div>
   );
 
   if (!isConnected) return (
-    <button style={btn} onClick={handleConnect}>🔗 Sign in with Base</button>
+    <div onClick={stop}>
+      <button style={btn} onClick={e => { stop(e); connect({ connector: baseConnector }); }}>
+        🔗 Sign in with Base
+      </button>
+    </div>
   );
 
   return (
